@@ -37,12 +37,20 @@ function checkForbiddenWords() {
         while ((match = regex.exec(textInput)) !== null) { // 查找所有匹配的位置
             // 记录匹配的词、标签和在原文中的位置
             detectedLabels.push({ word, label: full_label, index: match.index });
-            resultHTML = resultHTML.replace(regex, `<span class="highlight">${word}</span>`); // 高亮显示匹配到的禁止词
         }
     });
 
     // 按检测到的词在原文中的顺序排序
     detectedLabels.sort((a, b) => a.index - b.index);
+
+    // 执行高亮替换（按排序后的索引替换，避免重复替换影响顺序）
+    let offset = 0;
+    detectedLabels.forEach(({ word, index }) => {
+        const startIdx = index + offset;
+        const endIdx = startIdx + word.length;
+        resultHTML = resultHTML.slice(0, startIdx) + `<span class="highlight">${word}</span>` + resultHTML.slice(endIdx);
+        offset += `<span class="highlight"></span>`.length; // 更新偏移量
+    });
 
     document.getElementById('result').innerHTML = resultHTML; // 将处理后的文本显示在页面上
     displayDetectedWords(detectedLabels); // 显示检测到的词及其对应完整标签
