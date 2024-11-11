@@ -1,1 +1,2 @@
-# yxc
+
+https://laoaaa.github.io/yxc/
