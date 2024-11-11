@@ -55,7 +55,7 @@ function displayDetectedWords(detectedLabels) {
     if (detectedLabels.length > 0) {
         detectedLabels.forEach(({ word, label }) => {
             const listItem = document.createElement('li'); // 创建列表项
-            listItem.textContent = `${word} - 标签: ${label}`; // 设置列表项内容为“词 - 标签 (A-B-C 格式)”
+            listItem.textContent = `${word} - 注: ${label}`; // 设置列表项内容为“词 - 标签 (A-B-C 格式)”
             wordList.appendChild(listItem); // 将列表项添加到列表中
         });
         detectedWordsDiv.style.display = 'block'; // 显示检测词的区域
