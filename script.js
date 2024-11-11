@@ -28,18 +28,21 @@ async function loadForbiddenWordsWithLabels() {
 function checkForbiddenWords() {
     const textInput = document.getElementById('textInput').value; // 获取用户输入的文本
     let resultHTML = escapeHtml(textInput); // 对输入文本进行 HTML 转义，防止代码注入
-    let detectedWords = new Set(); // 创建一个集合用于存储检测到的禁止词
-    let detectedLabels = []; // 创建一个数组用于存储检测到的词及其对应完整标签
+    let detectedLabels = []; // 创建一个数组用于存储检测到的词、标签及其位置
 
     // 遍历禁止词表，检查输入文本中是否包含禁止词
     forbiddenWordsWithLabels.forEach(({ word, full_label }) => {
         const regex = new RegExp(`${escapeRegExp(word)}`, 'gi'); // 创建正则表达式用于匹配词语
-        if (regex.test(textInput)) {
-            detectedWords.add(word); // 将匹配到的禁止词加入集合
-            detectedLabels.push({ word, label: full_label }); // 将词和完整标签加入到数组中
+        let match;
+        while ((match = regex.exec(textInput)) !== null) { // 查找所有匹配的位置
+            // 记录匹配的词、标签和在原文中的位置
+            detectedLabels.push({ word, label: full_label, index: match.index });
             resultHTML = resultHTML.replace(regex, `<span class="highlight">${word}</span>`); // 高亮显示匹配到的禁止词
         }
     });
+
+    // 按检测到的词在原文中的顺序排序
+    detectedLabels.sort((a, b) => a.index - b.index);
 
     document.getElementById('result').innerHTML = resultHTML; // 将处理后的文本显示在页面上
     displayDetectedWords(detectedLabels); // 显示检测到的词及其对应完整标签
@@ -51,7 +54,7 @@ function displayDetectedWords(detectedLabels) {
     const wordList = document.getElementById('wordList'); // 获取列表元素
     wordList.innerHTML = ''; // 清空列表内容
 
-    // 如果有检测到的词，则遍历添加到列表中
+    // 如果有检测到的词，则按顺序添加到列表中
     if (detectedLabels.length > 0) {
         detectedLabels.forEach(({ word, label }) => {
             const listItem = document.createElement('li'); // 创建列表项
